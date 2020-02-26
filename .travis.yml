@@ -15,7 +15,6 @@ script:
 - make lint
 - make test
 - make vet
-- make website-test
 
 branches:
   only:
