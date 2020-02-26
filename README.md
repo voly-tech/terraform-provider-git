@@ -35,7 +35,17 @@ Using the provider
 provider "git" {}
 
 data "git_repository" "example" {
-  path = ".git"
+  path = path.root
+}
+
+resource "aws_vpc" "example" {
+  ...
+
+  tags = {
+    branch = data.git_repository.example.branch
+    commit = substr(data.git_repository.example.commit_sha, 0, 7)
+    tag    = data.git_repository.example.tag
+  }
 }
 ```
 
