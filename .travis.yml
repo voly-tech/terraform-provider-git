@@ -4,13 +4,13 @@ services:
   - docker
 language: go
 go:
-- 1.12
-env:
-  - GO111MODULE=on
+  - 1.13
 
 script:
+- make lint
 - make test
 - make vet
+- make website-test
 
 branches:
   only:

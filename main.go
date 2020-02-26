@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/terraform-providers/terraform-provider-scaffolding/scaffolding" // change this to the import path of your provider
+	"github.com/volcano-coffee-company/terraform-provider-git/git"
 )
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: scaffolding.Provider})
+		ProviderFunc: git.Provider})
 }
