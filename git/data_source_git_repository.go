@@ -16,9 +16,9 @@ func dataSourceGitRepository() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  ".git",
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GIT_DIR", ".git"),
 			},
 
 			"branch": {
