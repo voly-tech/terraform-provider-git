@@ -12,7 +12,7 @@ import (
 
 func dataSourceGitRepository() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceRepositoryRead,
+		Read: dataSourceGitRepositoryRead,
 
 		Schema: map[string]*schema.Schema{
 			"path": {
@@ -39,7 +39,7 @@ func dataSourceGitRepository() *schema.Resource {
 	}
 }
 
-func dataSourceRepositoryRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error {
 	path := d.Get("path").(string)
 
 	repo, err := git.PlainOpen(path)

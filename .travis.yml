@@ -5,6 +5,11 @@ services:
 language: go
 go:
   - 1.13
+env:
+  - GO111MODULE=on
+
+install:
+- make tools
 
 script:
 - make lint
