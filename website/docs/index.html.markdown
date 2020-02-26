@@ -1,25 +1,23 @@
 ---
-layout: "scaffolding"
-page_title: "Provider: Scaffolding"
-sidebar_current: "docs-scaffolding-index"
+layout: "git"
+page_title: "Provider: Git"
+sidebar_current: "docs-git-index"
 description: |-
-  Terraform provider scaffolding.
+  The Git provider is used to interact with git repositories.
 ---
 
-# Scaffolding Provider
+# Git Provider
 
-Use this paragraph to give a high-level overview of your provider, and any configuration it requires.
+The Git provider is used to interact with git repositories.
 
 Use the navigation to the left to read about the available resources.
 
 ## Example Usage
 
 ```hcl
-provider "scaffolding" {
-}
+provider "git" {}
 
-# Example resource configuration
-resource "scaffolding_resource" "example" {
-  # ...
+data "git_repository" "example" {
+  path = ".git"
 }
 ```
