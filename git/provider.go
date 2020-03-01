@@ -53,8 +53,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Username:              d.Get("username").(string),
 		Password:              d.Get("password").(string),
 		PrivateKeyFile:        d.Get("private_key_file").(string),
-		InsecureIgnoreHostKey: d.Get("insecure_ignore_host_key").(bool),
-		InsecureSkipTLSVerify: d.Get("insecure_skip_tls_verify").(bool),
+		InsecureIgnoreHostKey: d.Get("ignore_host_key").(bool),
+		InsecureSkipTLSVerify: d.Get("skip_tls_verify").(bool),
 	}
 
 	return config.Client()

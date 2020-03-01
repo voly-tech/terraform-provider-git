@@ -32,6 +32,6 @@ The following arguments are supported in the `provider` block:
 
 * `private_key_file` - (Optional) A path to a PEM-encoded private key. This is used to access a remote repository over SSH. It can also be sourced from the `GIT_PRIVATE_KEY_FILE` environment variable.
 
-* `ignore_host_key` - (Optional) Set this to `true` to disable SSH host key verification. This will accept any host key and is strongly discouraged. Default is `false`.
+* `ignore_host_key` - (Optional) Set this to `true` to disable SSH host key verification. This will accept any host key and is strongly discouraged. It can also be sourced from the `GIT_IGNORE_HOST_KEY` environment variable. Default is `false`.
 
-* `skip_tls_verify` - (Optional) Set this to `true` to disable verification of the server's TLS certificate chain. This is strongly discouraged. Default is `false`.
+* `skip_tls_verify` - (Optional) Set this to `true` to disable verification of the server's TLS certificate chain. This is strongly discouraged. It can also be sourced from the `GIT_SKIP_TLS_VERIFY` environment variable. Default is `false`.
