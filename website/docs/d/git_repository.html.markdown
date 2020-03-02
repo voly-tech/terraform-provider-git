@@ -22,12 +22,14 @@ data "git_repository" "example" {
 
 The following arguments are supported:
 
-* `path` - (Optional) The repository path. It can also be sourced from the `GIT_DIR` environment variable. Defaults to `.git`.
+* `path` - (Optional) The repository path. It can also be sourced from the `GIT_DIR` environment variable. Default is `.git`.
+
+* `url` - (Optional) The repository URL.
+
+* `branch` - (Optional) The name of the branch.
+
+* `tag` - (Optional) The name of the tag.
 
 ## Attributes Reference
 
-* `branch` - The name of the current branch.
-
 * `commit_sha` - The SHA-1 hash of the current commit.
-
-* `tag` - The name of the most recent tag that points to the current commit.
