@@ -26,17 +26,20 @@ func dataSourceGitRepository() *schema.Resource {
 			"url": {
 				Type:          schema.TypeString,
 				Optional:      true,
+				Computed:      true,
 				ConflictsWith: []string{"path"},
 			},
 
 			"branch": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 
 			"tag": {
 				Type:          schema.TypeString,
 				Optional:      true,
+				Computed:      true,
 				ConflictsWith: []string{"branch"},
 			},
 
