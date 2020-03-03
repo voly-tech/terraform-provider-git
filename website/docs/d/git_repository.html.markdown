@@ -3,12 +3,12 @@ layout: "git"
 page_title: "Git: git_repository"
 sidebar_current: "docs-git-datasource-repository"
 description: |-
-  Get details about a git repository.
+  Get details about a Git repository.
 ---
 
 # git_repository
 
-Use this data source to retrieve information about a git repository.
+Use this data source to retrieve information about a Git repository.
 
 ## Example Usage
 
