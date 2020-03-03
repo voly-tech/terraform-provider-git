@@ -6,8 +6,10 @@ import (
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"gopkg.in/src-d/go-billy.v4/memfs"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
 func dataSourceGitRepository() *schema.Resource {
@@ -21,17 +23,24 @@ func dataSourceGitRepository() *schema.Resource {
 				DefaultFunc: schema.EnvDefaultFunc("GIT_DIR", ".git"),
 			},
 
-			"branch": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"url": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"path"},
 			},
 
-			"commit_sha": {
+			"branch": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 
 			"tag": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"branch"},
+			},
+
+			"commit_sha": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -40,38 +49,84 @@ func dataSourceGitRepository() *schema.Resource {
 }
 
 func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error {
+	m := meta.(*Meta)
+	auth := m.Auth
+
 	path := d.Get("path").(string)
+	repoURL := d.Get("url").(string)
+	branch := d.Get("branch").(string)
+	tag := d.Get("tag").(string)
 
-	repo, err := git.PlainOpen(path)
-	if err != nil {
-		return fmt.Errorf("Error opening repository in %s: %s", path, err)
+	var repo *git.Repository
+	var ref *plumbing.Reference
+	var err error
+
+	if repoURL != "" {
+		cloneOptions := git.CloneOptions{
+			URL:          repoURL,
+			Auth:         auth,
+			SingleBranch: true,
+			Depth:        1,
+		}
+
+		if branch != "" {
+			cloneOptions.ReferenceName = plumbing.NewBranchReferenceName(branch)
+		} else if tag != "" {
+			cloneOptions.ReferenceName = plumbing.NewTagReferenceName(tag)
+		}
+
+		repo, err = git.Clone(memory.NewStorage(), memfs.New(), &cloneOptions)
+		if err != nil {
+			return fmt.Errorf("unable to clone repository: %s", err)
+		}
+	} else {
+		repo, err = git.PlainOpen(path)
+		if err != nil {
+			return fmt.Errorf("unable to open repository: %s", err)
+		}
+
+		remote, _ := repo.Remote(git.DefaultRemoteName)
+		if remote != nil {
+			repoURL = remote.Config().URLs[0]
+		}
 	}
 
-	ref, err := repo.Head()
-	if err != nil {
-		return fmt.Errorf("Error getting HEAD reference: %s", err)
+	if branch != "" {
+		ref, err = repo.Reference(plumbing.NewBranchReferenceName(branch), false)
+		if err != nil {
+			return fmt.Errorf("unable to get branch: %s", err)
+		}
+	} else {
+		ref, err = repo.Head()
+		if err != nil {
+			return fmt.Errorf("unable to get HEAD ref: %s", err)
+		}
+
+		if ref.Name().IsBranch() {
+			branch = ref.Name().Short()
+		}
 	}
 
-	refName := ref.Name()
+	if tag != "" {
+		ref, err = repo.Reference(plumbing.NewTagReferenceName(tag), false)
+		if err != nil {
+			return fmt.Errorf("unable to get tag: %s", err)
+		}
+	} else {
+		tags, err := getTags(repo, ref)
+		if err != nil {
+			return fmt.Errorf("unable to get tags: %s", err)
+		}
 
-	branch := ""
-	if refName.IsBranch() {
-		branch = refName.Short()
-	}
-
-	tag := ""
-	tags, err := getTags(repo, ref)
-	if err != nil {
-		return fmt.Errorf("Error getting tags: %s", err)
-	}
-
-	if tags != nil {
-		tag = getLatestTag(tags)
+		if tags != nil {
+			tag = getLatestTag(tags)
+		}
 	}
 
 	d.Set("branch", branch)
 	d.Set("commit_sha", ref.Hash().String())
 	d.Set("tag", tag)
+	d.Set("url", repoURL)
 
 	d.SetId(ref.Name().String())
 
