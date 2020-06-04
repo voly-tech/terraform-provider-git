@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/volcano-coffee-company/terraform-provider-git/git"
+	"github.com/innovationnorway/terraform-provider-git/internal/git"
 )
 
 func main() {
