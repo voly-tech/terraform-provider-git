@@ -6,6 +6,7 @@ import (
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -18,28 +19,32 @@ func dataSourceGitRepository() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"path": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GIT_DIR", ".git"),
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
+				DefaultFunc:  schema.EnvDefaultFunc("GIT_DIR", ".git"),
 			},
 
 			"url": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"path"},
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
+				ExactlyOneOf: []string{"path", "url"},
 			},
 
 			"branch": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
 			},
 
 			"tag": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
+				ValidateFunc:  validation.StringIsNotEmpty,
 				ConflictsWith: []string{"branch"},
 			},
 

@@ -27,7 +27,7 @@ func TestAccDataSourceGitRepository_path(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join(cwd, "..", ".git")
+	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
 
 	branch := execGit(t, "rev-parse", "--abbrev-ref", "HEAD")
 	commit := execGit(t, "rev-parse", "HEAD")
@@ -51,7 +51,7 @@ func TestAccDataSourceGitRepository_branch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join(cwd, "..", ".git")
+	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
 
 	branch := "master"
 	commit := execGit(t, "rev-parse", branch)
@@ -75,7 +75,7 @@ func TestAccDataSourceGitRepository_tag(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join(cwd, "..", ".git")
+	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
 
 	tag := "v0.1.0"
 	commit := execGit(t, "rev-parse", tag)
@@ -95,7 +95,7 @@ func TestAccDataSourceGitRepository_tag(t *testing.T) {
 }
 
 func TestAccDataSourceGitRepository_HTTPURL(t *testing.T) {
-	url := "https://github.com/volcano-coffee-company/terraform-provider-git.git"
+	url := "https://github.com/innovationnorway/terraform-provider-git.git"
 	tag := "v0.1.0"
 
 	resource.Test(t, resource.TestCase{
