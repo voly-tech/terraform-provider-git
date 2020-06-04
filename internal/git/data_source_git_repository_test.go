@@ -22,7 +22,7 @@ func execGit(t *testing.T, arg ...string) string {
 	return strings.TrimSpace(string(output))
 }
 
-func TestDataSourceGitRepository_path(t *testing.T) {
+func TestAccDataSourceGitRepository_path(t *testing.T) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -36,7 +36,7 @@ func TestDataSourceGitRepository_path(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testDataSourceGitRepositoryPathConfig(path),
+				Config: testAccDataSourceGitRepositoryPathConfig(path),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.git_repository.test", "branch", strings.TrimSpace(branch)),
 					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
@@ -46,7 +46,7 @@ func TestDataSourceGitRepository_path(t *testing.T) {
 	})
 }
 
-func TestDataSourceGitRepository_branch(t *testing.T) {
+func TestAccDataSourceGitRepository_branch(t *testing.T) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -60,7 +60,7 @@ func TestDataSourceGitRepository_branch(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testDataSourceGitRepositoryBranchConfig(path, branch),
+				Config: testAccDataSourceGitRepositoryBranchConfig(path, branch),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.git_repository.test", "branch", branch),
 					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
@@ -70,7 +70,7 @@ func TestDataSourceGitRepository_branch(t *testing.T) {
 	})
 }
 
-func TestDataSourceGitRepository_tag(t *testing.T) {
+func TestAccDataSourceGitRepository_tag(t *testing.T) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +84,7 @@ func TestDataSourceGitRepository_tag(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testDataSourceGitRepositoryTagConfig(path, tag),
+				Config: testAccDataSourceGitRepositoryTagConfig(path, tag),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.git_repository.test", "tag", tag),
 					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
@@ -94,7 +94,7 @@ func TestDataSourceGitRepository_tag(t *testing.T) {
 	})
 }
 
-func TestDataSourceGitRepository_HTTPURL(t *testing.T) {
+func TestAccDataSourceGitRepository_HTTPURL(t *testing.T) {
 	url := "https://github.com/volcano-coffee-company/terraform-provider-git.git"
 	tag := "v0.1.0"
 
@@ -113,7 +113,7 @@ func TestDataSourceGitRepository_HTTPURL(t *testing.T) {
 	})
 }
 
-func testDataSourceGitRepositoryPathConfig(path string) string {
+func testAccDataSourceGitRepositoryPathConfig(path string) string {
 	return fmt.Sprintf(`
 data git_repository "test" {
   path = "%s"
@@ -121,7 +121,7 @@ data git_repository "test" {
 `, path)
 }
 
-func testDataSourceGitRepositoryBranchConfig(path string, branch string) string {
+func testAccDataSourceGitRepositoryBranchConfig(path string, branch string) string {
 	return fmt.Sprintf(`
 data git_repository "test" {
   path   = "%s"
@@ -130,7 +130,7 @@ data git_repository "test" {
 `, path, branch)
 }
 
-func testDataSourceGitRepositoryTagConfig(path string, tag string) string {
+func testAccDataSourceGitRepositoryTagConfig(path string, tag string) string {
 	return fmt.Sprintf(`
 data git_repository "test" {
   path = "%s"
@@ -139,7 +139,7 @@ data git_repository "test" {
 `, path, tag)
 }
 
-func testDataSourceGitRepositoryURLConfig(url string, tag string) string {
+func testAccDataSourceGitRepositoryURLConfig(url string, tag string) string {
 	return fmt.Sprintf(`
 data git_repository "test" {
   url = "%s"
