@@ -102,7 +102,7 @@ func TestAccDataSourceGitRepository_HTTPURL(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testDataSourceGitRepositoryURLConfig(url, tag),
+				Config: testAccDataSourceGitRepositoryURLConfig(url, tag),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.git_repository.test", "url", url),
 					resource.TestCheckResourceAttr("data.git_repository.test", "tag", tag),
