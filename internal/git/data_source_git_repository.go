@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/go-git/go-billy/v5/memfs"
+	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/storage/memory"
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"gopkg.in/src-d/go-billy.v4/memfs"
-	git "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
 func dataSourceGitRepository() *schema.Resource {
