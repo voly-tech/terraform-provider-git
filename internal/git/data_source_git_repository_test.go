@@ -3,24 +3,11 @@ package git
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
-
-func execGit(t *testing.T, arg ...string) string {
-	t.Helper()
-
-	output, err := exec.Command("git", arg...).Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return strings.TrimSpace(string(output))
-}
 
 func TestAccDataSourceGitRepository_path(t *testing.T) {
 	cwd, err := os.Getwd()
