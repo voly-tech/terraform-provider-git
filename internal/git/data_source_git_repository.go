@@ -2,13 +2,11 @@ package git
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/go-git/go-billy/v5/memfs"
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
-	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -66,21 +64,23 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 	tag := d.Get("tag").(string)
 
 	var repo *git.Repository
+	var refName plumbing.ReferenceName
 	var ref *plumbing.Reference
 	var err error
 
+	if branch != "" {
+		refName = plumbing.NewBranchReferenceName(branch)
+	} else if tag != "" {
+		refName = plumbing.NewTagReferenceName(tag)
+	}
+
 	if repoURL != "" {
 		cloneOptions := git.CloneOptions{
-			URL:          repoURL,
-			Auth:         auth,
-			SingleBranch: true,
-			Depth:        1,
-		}
-
-		if branch != "" {
-			cloneOptions.ReferenceName = plumbing.NewBranchReferenceName(branch)
-		} else if tag != "" {
-			cloneOptions.ReferenceName = plumbing.NewTagReferenceName(tag)
+			URL:           repoURL,
+			Auth:          auth,
+			ReferenceName: refName,
+			SingleBranch:  true,
+			Depth:         1,
 		}
 
 		repo, err = git.Clone(memory.NewStorage(), memfs.New(), &cloneOptions)
@@ -100,7 +100,7 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if branch != "" {
-		ref, err = repo.Reference(plumbing.NewBranchReferenceName(branch), false)
+		ref, err = repo.Reference(refName, false)
 		if err != nil {
 			return fmt.Errorf("unable to get branch: %s", err)
 		}
@@ -116,7 +116,7 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if tag != "" {
-		ref, err = repo.Reference(plumbing.NewTagReferenceName(tag), false)
+		ref, err = repo.Reference(refName, false)
 		if err != nil {
 			return fmt.Errorf("unable to get tag: %s", err)
 		}
@@ -139,45 +139,4 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 	d.SetId(ref.Name().String())
 
 	return nil
-}
-
-func getTags(repo *git.Repository, ref *plumbing.Reference) ([]string, error) {
-	var tags []string
-
-	tagRefs, err := repo.Tags()
-	if err != nil {
-		return nil, err
-	}
-
-	err = tagRefs.ForEach(func(tag *plumbing.Reference) error {
-		if tag.Hash().String() == ref.Hash().String() {
-			tags = append(tags, tag.Name().Short())
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return tags, nil
-}
-
-func getLatestTag(tags []string) string {
-	var versions []*version.Version
-
-	for _, t := range tags {
-		v, _ := version.NewVersion(t)
-		if v != nil {
-			versions = append(versions, v)
-		}
-	}
-
-	sort.Sort(sort.Reverse(version.Collection(versions)))
-	if len(versions) > 0 {
-		return versions[0].Original()
-	}
-
-	sort.Strings(tags)
-	return tags[0]
 }

@@ -27,10 +27,7 @@ func TestAccDataSourceGitRepository_path(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
-
-	branch := execGit(t, "rev-parse", "--abbrev-ref", "HEAD")
-	commit := execGit(t, "rev-parse", "HEAD")
+	path := filepath.ToSlash(filepath.Join(cwd, "testdata", "terraform-git-module-acctest"))
 
 	resource.Test(t, resource.TestCase{
 		Providers: testAccProviders,
@@ -38,8 +35,8 @@ func TestAccDataSourceGitRepository_path(t *testing.T) {
 			{
 				Config: testAccDataSourceGitRepositoryPathConfig(path),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.git_repository.test", "branch", strings.TrimSpace(branch)),
-					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
+					resource.TestCheckResourceAttr("data.git_repository.test", "branch", "master"),
+					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", "750e948880ebe167eba524dded790e8b9a79d01d"),
 				),
 			},
 		},
@@ -51,10 +48,9 @@ func TestAccDataSourceGitRepository_branch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
+	path := filepath.ToSlash(filepath.Join(cwd, "testdata", "terraform-git-module-acctest"))
 
 	branch := "master"
-	commit := execGit(t, "rev-parse", branch)
 
 	resource.Test(t, resource.TestCase{
 		Providers: testAccProviders,
@@ -62,8 +58,8 @@ func TestAccDataSourceGitRepository_branch(t *testing.T) {
 			{
 				Config: testAccDataSourceGitRepositoryBranchConfig(path, branch),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.git_repository.test", "branch", branch),
-					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
+					resource.TestCheckResourceAttr("data.git_repository.test", "branch", "master"),
+					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", "750e948880ebe167eba524dded790e8b9a79d01d"),
 				),
 			},
 		},
@@ -75,10 +71,9 @@ func TestAccDataSourceGitRepository_tag(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.ToSlash(filepath.Join(cwd, "..", "..", ".git"))
+	path := filepath.ToSlash(filepath.Join(cwd, "testdata", "terraform-git-module-acctest"))
 
 	tag := "v0.1.0"
-	commit := execGit(t, "rev-parse", tag)
 
 	resource.Test(t, resource.TestCase{
 		Providers: testAccProviders,
@@ -86,8 +81,8 @@ func TestAccDataSourceGitRepository_tag(t *testing.T) {
 			{
 				Config: testAccDataSourceGitRepositoryTagConfig(path, tag),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.git_repository.test", "tag", tag),
-					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", strings.TrimSpace(commit)),
+					resource.TestCheckResourceAttr("data.git_repository.test", "tag", "v0.1.0"),
+					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", "750e948880ebe167eba524dded790e8b9a79d01d"),
 				),
 			},
 		},
@@ -95,7 +90,7 @@ func TestAccDataSourceGitRepository_tag(t *testing.T) {
 }
 
 func TestAccDataSourceGitRepository_HTTPURL(t *testing.T) {
-	url := "https://github.com/innovationnorway/terraform-provider-git.git"
+	url := "https://github.com/innovationnorway/terraform-git-module-acctest.git"
 	tag := "v0.1.0"
 
 	resource.Test(t, resource.TestCase{
@@ -106,7 +101,7 @@ func TestAccDataSourceGitRepository_HTTPURL(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.git_repository.test", "url", url),
 					resource.TestCheckResourceAttr("data.git_repository.test", "tag", tag),
-					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", "396998df97b55acaa7d1645c0d90b3125ff51704"),
+					resource.TestCheckResourceAttr("data.git_repository.test", "commit_sha", "750e948880ebe167eba524dded790e8b9a79d01d"),
 				),
 			},
 		},
