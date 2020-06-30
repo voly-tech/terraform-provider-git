@@ -1,3 +1,0 @@
-[submodule "internal/git/testdata/terraform-git-module-acctest"]
-	path = internal/git/testdata/terraform-git-module-acctest
-	url = https://github.com/innovationnorway/terraform-git-module-acctest.git
