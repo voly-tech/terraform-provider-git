@@ -17,6 +17,7 @@ func Provider() terraform.ResourceProvider {
 			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("GIT_PASSWORD", nil),
 			},
 
