@@ -51,11 +51,11 @@ func dataSourceGitRepository() *schema.Resource {
 	}
 }
 
-func dataSourceGitRepositoryRead(d *schema.ResourceData, m interface{}) error {
-	meta := m.(*Meta)
+func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error {
+	m := meta.(*Meta)
 
 	params := RepoParams{
-		Auth: meta.Auth,
+		Auth: m.Auth,
 	}
 
 	if v, ok := d.GetOk("url"); ok {

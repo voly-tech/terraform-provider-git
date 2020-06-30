@@ -31,7 +31,7 @@ func getRepo(r RepoParams) (*git.Repository, error) {
 		options := git.CloneOptions{
 			URL:           r.URL,
 			Auth:          r.Auth,
-			ReferenceName: plumbing.ReferenceName(r.Ref),
+			ReferenceName: r.Ref,
 			SingleBranch:  true,
 			Depth:         1,
 		}
