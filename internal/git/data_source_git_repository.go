@@ -3,10 +3,7 @@ package git
 import (
 	"fmt"
 
-	"github.com/go-git/go-billy/v5/memfs"
-	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -20,7 +17,7 @@ func dataSourceGitRepository() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
-				DefaultFunc:  schema.EnvDefaultFunc("GIT_DIR", ".git"),
+				DefaultFunc:  schema.EnvDefaultFunc("GIT_DIR", nil),
 			},
 
 			"url": {
@@ -56,70 +53,47 @@ func dataSourceGitRepository() *schema.Resource {
 
 func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error {
 	m := meta.(*Meta)
-	auth := m.Auth
 
-	path := d.Get("path").(string)
-	repoURL := d.Get("url").(string)
-	branch := d.Get("branch").(string)
-	tag := d.Get("tag").(string)
-
-	var repo *git.Repository
-	var refName plumbing.ReferenceName
-	var ref *plumbing.Reference
-	var err error
-
-	if branch != "" {
-		refName = plumbing.NewBranchReferenceName(branch)
-	} else if tag != "" {
-		refName = plumbing.NewTagReferenceName(tag)
+	params := RepoParams{
+		Auth: m.Auth,
 	}
 
-	if repoURL != "" {
-		cloneOptions := git.CloneOptions{
-			URL:           repoURL,
-			Auth:          auth,
-			ReferenceName: refName,
-			SingleBranch:  true,
-			Depth:         1,
-		}
-
-		repo, err = git.Clone(memory.NewStorage(), memfs.New(), &cloneOptions)
-		if err != nil {
-			return fmt.Errorf("unable to clone repository: %s", err)
-		}
-	} else {
-		repo, err = git.PlainOpen(path)
-		if err != nil {
-			return fmt.Errorf("unable to open repository: %s", err)
-		}
-
-		remote, _ := repo.Remote(git.DefaultRemoteName)
-		if remote != nil {
-			repoURL = remote.Config().URLs[0]
-		}
+	if v, ok := d.GetOk("url"); ok {
+		params.URL = v.(string)
 	}
 
-	if branch != "" {
-		ref, err = repo.Reference(refName, false)
-		if err != nil {
-			return fmt.Errorf("unable to get branch: %s", err)
-		}
-	} else {
-		ref, err = repo.Head()
-		if err != nil {
-			return fmt.Errorf("unable to get HEAD ref: %s", err)
-		}
-
-		if ref.Name().IsBranch() {
-			branch = ref.Name().Short()
-		}
+	if v, ok := d.GetOk("path"); ok {
+		params.Path = v.(string)
 	}
 
-	if tag != "" {
-		ref, err = repo.Reference(refName, false)
-		if err != nil {
-			return fmt.Errorf("unable to get tag: %s", err)
-		}
+	if v, ok := d.GetOk("branch"); ok {
+		params.Ref = plumbing.NewBranchReferenceName(v.(string))
+	}
+
+	if v, ok := d.GetOk("tag"); ok {
+		params.Ref = plumbing.NewTagReferenceName(v.(string))
+	}
+
+	repo, err := getRepo(params)
+	if err != nil {
+		return fmt.Errorf("unable to get repository: %s", err)
+	}
+
+	ref, err := getRef(repo, params.Ref)
+	if err != nil {
+		return fmt.Errorf("unable to get reference: %s", err)
+	}
+
+	if params.URL == "" {
+		d.Set("url", getRemoteURL(repo))
+	}
+
+	if ref.Name().IsBranch() {
+		d.Set("branch", ref.Name().Short())
+	}
+
+	if ref.Name().IsTag() {
+		d.Set("tag", ref.Name().Short())
 	} else {
 		tags, err := getTags(repo, ref)
 		if err != nil {
@@ -127,15 +101,11 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 		}
 
 		if tags != nil {
-			tag = getLatestTag(tags)
+			d.Set("tag", getLatestTag(tags))
 		}
 	}
 
-	d.Set("branch", branch)
 	d.Set("commit_sha", ref.Hash().String())
-	d.Set("tag", tag)
-	d.Set("url", repoURL)
-
 	d.SetId(ref.Name().String())
 
 	return nil

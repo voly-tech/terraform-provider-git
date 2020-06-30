@@ -6,7 +6,7 @@ Use this data source to retrieve information about a Git repository.
 
 ```hcl
 data "git_repository" "example" {
-  path = path.cwd
+  path = path.root
 }
 ```
 
