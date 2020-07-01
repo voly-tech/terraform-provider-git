@@ -36,7 +36,6 @@ func (c *Config) Client() (interface{}, error) {
 	}
 
 	if c.PrivateKeyFile != "" {
-
 		auth, err := getSSHKeyFromFile(c.PrivateKeyFile, c.InsecureIgnoreHostKey)
 		if err != nil {
 			return nil, fmt.Errorf("unable to get ssh key from file: %s", err)
