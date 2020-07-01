@@ -21,11 +21,19 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GIT_PASSWORD", nil),
 			},
 
+			"private_key": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				DefaultFunc:   schema.EnvDefaultFunc("GIT_PRIVATE_KEY", nil),
+				ConflictsWith: []string{"username", "password"},
+			},
+
 			"private_key_file": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				DefaultFunc:   schema.EnvDefaultFunc("GIT_PRIVATE_KEY_FILE", nil),
-				ConflictsWith: []string{"username", "password"},
+				ConflictsWith: []string{"username", "password", "private_key"},
 			},
 
 			"ignore_host_key": {
@@ -53,6 +61,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Username:              d.Get("username").(string),
 		Password:              d.Get("password").(string),
+		PrivateKey:            d.Get("private_key").(string),
 		PrivateKeyFile:        d.Get("private_key_file").(string),
 		InsecureIgnoreHostKey: d.Get("ignore_host_key").(bool),
 		InsecureSkipTLSVerify: d.Get("skip_tls_verify").(bool),

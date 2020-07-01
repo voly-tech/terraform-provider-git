@@ -7,8 +7,10 @@ import (
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport"
+	gitssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/go-git/go-git/v5/storage/memory"
 	version "github.com/hashicorp/go-version"
+	"golang.org/x/crypto/ssh"
 )
 
 type RepoParams struct {
@@ -91,4 +93,34 @@ func getLatestTag(tags []string) string {
 
 	sort.Strings(tags)
 	return tags[0]
+}
+
+func getSSHKey(key string, ignoreHostKey bool) (*gitssh.PublicKeys, error) {
+	auth, err := gitssh.NewPublicKeys(gitssh.DefaultUsername, []byte(key), "")
+	if err != nil {
+		return nil, err
+	}
+
+	if ignoreHostKey {
+		auth.HostKeyCallbackHelper = gitssh.HostKeyCallbackHelper{
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
+	}
+
+	return auth, nil
+}
+
+func getSSHKeyFromFile(keyFile string, ignoreHostKey bool) (*gitssh.PublicKeys, error) {
+	auth, err := gitssh.NewPublicKeysFromFile(gitssh.DefaultUsername, keyFile, "")
+	if err != nil {
+		return nil, err
+	}
+
+	if ignoreHostKey {
+		auth.HostKeyCallbackHelper = gitssh.HostKeyCallbackHelper{
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
+	}
+
+	return auth, nil
 }
