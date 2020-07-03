@@ -34,6 +34,9 @@ func TestAccDataSourceGitRepository_new(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = ioutil.WriteFile(filepath.Join(dir, "test.txt"), []byte("hello world!"), 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, err = worktree.Add("test.txt")
 	if err != nil {
 		t.Fatal(err)
@@ -45,7 +48,13 @@ func TestAccDataSourceGitRepository_new(t *testing.T) {
 			When:  time.Now(),
 		},
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	obj, err := repo.CommitObject(commit)
+	if err != nil {
+		t.Fatal(err)
+	}
 	hash := obj.Hash.String()
 
 	path := filepath.ToSlash(dir)
