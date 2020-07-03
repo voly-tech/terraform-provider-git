@@ -1,3 +1,9 @@
+## 0.1.2 (July 03, 2020)
+
+BUG FIXES:
+
+* **Data Source** `git_repository`: Fix nil pointer reference for remote `url` ([#36](https://github.com/innovationnorway/terraform-provider-git/issues/36))
+
 ## 0.1.1 (July 01, 2020)
 
 ENHANCEMENTS:
