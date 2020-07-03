@@ -47,7 +47,7 @@ func getRepo(r RepoParams) (*git.Repository, error) {
 func getRemoteURL(repo *git.Repository) string {
 	remoteURL := ""
 	remote, _ := repo.Remote(git.DefaultRemoteName)
-	if len(remote.Config().URLs) > 0 {
+	if remote != nil {
 		remoteURL = remote.Config().URLs[0]
 	}
 
