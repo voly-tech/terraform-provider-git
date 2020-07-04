@@ -66,6 +66,18 @@ func getTags(repo *git.Repository, ref *plumbing.Reference) ([]string, error) {
 		if tag.Hash().String() == ref.Hash().String() {
 			tags = append(tags, tag.Name().Short())
 		}
+
+		obj, _ := repo.TagObject(tag.Hash())
+		if obj != nil {
+			commit, _ := obj.Commit()
+			if commit != nil {
+				if commit.Hash.String() == ref.Hash().String() {
+					tags = append(tags, tag.Name().Short())
+				}
+			}
+
+		}
+
 		return nil
 	})
 
