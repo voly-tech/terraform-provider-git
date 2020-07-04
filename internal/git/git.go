@@ -75,7 +75,6 @@ func getTags(repo *git.Repository, ref *plumbing.Reference) ([]string, error) {
 					tags = append(tags, tag.Name().Short())
 				}
 			}
-
 		}
 
 		return nil
