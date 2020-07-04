@@ -1,3 +1,9 @@
+## 0.1.3 (July 04, 2020)
+
+BUG FIXES:
+
+* **Data Source** `git_repository`: get lightweight and annotated tags ([#39](https://github.com/innovationnorway/terraform-provider-git/issues/39))
+
 ## 0.1.2 (July 03, 2020)
 
 BUG FIXES:
