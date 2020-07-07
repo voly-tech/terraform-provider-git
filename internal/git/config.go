@@ -2,12 +2,12 @@ package git
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net/http"
 
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/client"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 )
 
 type Config struct {
@@ -23,13 +23,13 @@ type Meta struct {
 	Auth transport.AuthMethod
 }
 
-func (c *Config) Client() (interface{}, error) {
+func (c *Config) Client() (interface{}, diag.Diagnostics) {
 	var meta Meta
 
 	if c.PrivateKey != "" {
 		auth, err := getSSHKey(c.PrivateKey, c.InsecureIgnoreHostKey)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get ssh key: %s", err)
+			return nil, diag.Errorf("unable to get ssh key: %s", err)
 		}
 
 		meta.Auth = auth
@@ -38,7 +38,7 @@ func (c *Config) Client() (interface{}, error) {
 	if c.PrivateKeyFile != "" {
 		auth, err := getSSHKeyFromFile(c.PrivateKeyFile, c.InsecureIgnoreHostKey)
 		if err != nil {
-			return nil, fmt.Errorf("unable to get ssh key from file: %s", err)
+			return nil, diag.Errorf("unable to get ssh key from file: %s", err)
 		}
 
 		meta.Auth = auth
