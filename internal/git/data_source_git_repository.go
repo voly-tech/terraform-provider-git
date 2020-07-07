@@ -1,16 +1,17 @@
 package git
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceGitRepository() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitRepositoryRead,
+		ReadContext: dataSourceGitRepositoryRead,
 
 		Schema: map[string]*schema.Schema{
 			"path": {
@@ -51,7 +52,7 @@ func dataSourceGitRepository() *schema.Resource {
 	}
 }
 
-func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitRepositoryRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	m := meta.(*Meta)
 
 	params := RepoParams{
@@ -76,12 +77,12 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 
 	repo, err := getRepo(params)
 	if err != nil {
-		return fmt.Errorf("unable to get repository: %s", err)
+		return diag.Errorf("unable to get repository: %s", err)
 	}
 
 	ref, err := getRef(repo, params.Ref)
 	if err != nil {
-		return fmt.Errorf("unable to get reference: %s", err)
+		return diag.Errorf("unable to get reference: %s", err)
 	}
 
 	if params.URL == "" {
@@ -97,7 +98,7 @@ func dataSourceGitRepositoryRead(d *schema.ResourceData, meta interface{}) error
 	} else {
 		tags, err := getTags(repo, ref)
 		if err != nil {
-			return fmt.Errorf("unable to get tags: %s", err)
+			return diag.Errorf("unable to get tags: %s", err)
 		}
 
 		if tags != nil {

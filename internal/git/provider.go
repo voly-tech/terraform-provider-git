@@ -1,11 +1,13 @@
 package git
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"username": {
@@ -53,16 +55,15 @@ func Provider() terraform.ResourceProvider {
 			"git_repository": dataSourceGitRepository(),
 		},
 
-		ConfigureFunc: providerConfigure,
+		ConfigureContextFunc: providerConfigure,
 	}
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Username:              d.Get("username").(string),
 		Password:              d.Get("password").(string),
 		PrivateKey:            d.Get("private_key").(string),
-		PrivateKeyFile:        d.Get("private_key_file").(string),
 		InsecureIgnoreHostKey: d.Get("ignore_host_key").(bool),
 		InsecureSkipTLSVerify: d.Get("skip_tls_verify").(bool),
 	}
