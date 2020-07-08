@@ -36,6 +36,7 @@ func Provider() *schema.Provider {
 				Optional:      true,
 				DefaultFunc:   schema.EnvDefaultFunc("GIT_PRIVATE_KEY_FILE", nil),
 				ConflictsWith: []string{"username", "password", "private_key"},
+				Deprecated:    "Deprecated in favour of `private_key`",
 			},
 
 			"ignore_host_key": {
